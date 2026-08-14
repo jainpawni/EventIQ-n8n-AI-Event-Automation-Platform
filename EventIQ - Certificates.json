@@ -1,0 +1,244 @@
+{
+  "name": "EventIQ - Certificates",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE",
+          "mode": "list",
+          "cachedResultName": "EventIQ_Attendance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2136917939,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE/edit#gid=2136917939"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "60436369-ee17-49a4-967e-8ad92bf8eb20",
+      "name": "Get att. record",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TgSp6GlpVQAXbGgB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1e204580-3f85-4e18-b250-5f00477d43cd",
+              "leftValue": "={{$json['STATUS']}}",
+              "rightValue": "Present",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "2c32eb82-d94f-4483-9a65-9109c66a944c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n\n<html>\n  <body style=\"font-family: Arial; text-align:center; padding:40px; border:10px solid #2563eb;\">\n\n    <h1 style=\"color:#2563eb; font-size:42px;\">Certificate of Participation</h1>\n\n    <br>\n\n    <p style=\"font-size:20px;\">This is to certify that</p>\n\n    <h2 style=\"font-size:36px; color:#111827;\">\n      {{$json[\"Email Address\"]}}\n    </h2>\n\n    <p style=\"font-size:20px;\">has successfully attended the</p>\n\n    <h3 style=\"font-size:28px; color:#2563eb;\">AI Workshop</h3>\n\n    <p style=\"font-size:20px;\">organized by</p>\n\n    <h3 style=\"font-size:28px;\">Team EventIQ</h3>\n\n    <br><br>\n\n    <p style=\"font-size:18px;\">Date: 10 August 2026</p>\n\n    <br><br><br>\n\n    <p style=\"font-size:18px;\"><b>Authorized Signature</b></p>\n\n  </body>\n</html>\n\n"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        -112
+      ],
+      "id": "24d0d4a7-7698-4f89-a28d-e430d3068add",
+      "name": "certificate"
+    },
+    {
+      "parameters": {
+        "name": "certificate.html",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        912,
+        -112
+      ],
+      "id": "31b140e6-53a3-4e43-a7ef-93b7c126039a",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9xAjMa1QmgfUrG5W",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pdfshift.io/v3/convert/pdf",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "source",
+              "value": "={{$json['html']}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        688,
+        -112
+      ],
+      "id": "5a4f08fa-42d0-4f78-9fc7-8e668a9f50aa",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$node['Get att. record'].json['Email Address']}}",
+        "subject": "Your EventIQ Participation Certificate",
+        "message": "=Dear Participant,<br><br>  Congratulations! Your participation certificate has been generated successfully.<br><br>  You can view or download it here:<br> <a href=\"{{$node['Upload file'].json['webViewLink']}}\">View Certificate</a><br><br>  Regards,<br> <b>Team EventIQ</b> ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        -96
+      ],
+      "id": "8feb099c-03ae-4bba-a980-9dd16c92439b",
+      "name": "Send a message",
+      "webhookId": "4ebecc4c-f280-40b0-9f0f-6f9dcd4e3c7e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ncQ4Emo70ufXHDI",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get att. record": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "certificate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "certificate": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "10c58869-b54c-4d0b-9c08-b68cabc9e4a7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "31436626922295248cc6498e5fe2cc77c0eeac70739fb6ac81173dd2fadcc8a9"
+  },
+  "nodeGroups": [],
+  "id": "LChRYpfkz304ecWD",
+  "tags": []
+}

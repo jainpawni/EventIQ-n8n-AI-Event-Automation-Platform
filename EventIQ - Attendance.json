@@ -1,0 +1,206 @@
+{
+  "name": "EventIQ - Attendance",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE",
+          "mode": "list",
+          "cachedResultName": "EventIQ_Attendance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2136917939,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE/edit#gid=2136917939"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ee43f20d-1762-44fd-b9f0-0cbbf0b1c68c",
+      "name": "Attendance Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "UAJiKk1n45BueE7P",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE",
+          "mode": "list",
+          "cachedResultName": "EventIQ_Attendance",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2136917939,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1v4zEv1LbSk4C_xY-yI2Oo-UrFFTdaLa9HtB7n9qbULE/edit#gid=2136917939"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "STATUS": "Present",
+            "Registration ID": "={{$json['Registration ID']}}"
+          },
+          "matchingColumns": [
+            "Registration ID"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Registration ID",
+              "displayName": "Registration ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email Address",
+              "displayName": "Email Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "STATUS",
+              "displayName": "STATUS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "be792080-d4aa-44d1-9c30-3a613fb0a540",
+      "name": "Update STATUS",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TgSp6GlpVQAXbGgB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$node['Attendance Trigger'].json['Email Address']}}",
+        "subject": "Attendance Confirmed - EventIQ",
+        "message": "=Dear Participant,<br><br> Your attendance has been recorded successfully for the event.<br><br> <b>Registration ID:</b> {{$node['Attendance Trigger'].json['Registration ID']}}<br> <b>Status:</b> Present<br><br> Thank you for attending the session.<br><br> Regards,<br> <b>Team EventIQ</b>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "0ffb6be7-400e-4795-b98f-b449ce4687d3",
+      "name": "Send a message",
+      "webhookId": "772129b8-5e1a-46c2-a865-57ace8a7bc57",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ncQ4Emo70ufXHDI",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Attendance Trigger": {
+      "main": [
+        [
+          {
+            "node": "Update STATUS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update STATUS": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "afab3a30-b028-4edb-b81f-d73511f40d56",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "31436626922295248cc6498e5fe2cc77c0eeac70739fb6ac81173dd2fadcc8a9"
+  },
+  "nodeGroups": [],
+  "id": "hrHvwDUtlqFT1lzK",
+  "tags": []
+}

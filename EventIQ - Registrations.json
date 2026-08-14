@@ -1,0 +1,232 @@
+{
+  "name": "EventIQ - Registrations",
+  "nodes": [
+    {
+      "parameters": {
+        "name": "={{$json.registration_id}}.png",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "0f8e8f00-a76f-46c7-ac30-d53438e608b9",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "9xAjMa1QmgfUrG5W",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$node['REGISTRATION Trigger'].json['Email Address']}}",
+        "subject": "=Registration Confirmed - {{$node['REGISTRATION Trigger'].json['Event Name']}}",
+        "message": "=Dear {{$node['REGISTRATION Trigger'].json['Full Name']}},<br><br>  Thank you for registering for <b>{{$node['REGISTRATION Trigger'].json['Event Name']}}</b>.<br><br>  Your registration has been confirmed successfully.<br><br>  <b>Registration ID:</b> {{$node['REG.ID'].json.registration_id}}<br><br>  Your QR code is ready:<br> <a href='{{$json.webViewLink}}'>View QR Code</a><br><br>  Please keep this ID and QR code for attendance and certificate generation.<br><br>  Regards,<br> <b>Team EventIQ</b>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "cce78ffc-1add-45e0-a05d-b8461635db6f",
+      "name": "Send a message",
+      "webhookId": "38f1bd54-0089-49dd-ba53-f7bdf96181d8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6ncQ4Emo70ufXHDI",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "7154973398",
+        "text": "=🎉 New Event Registration 👤 {{$node['REGISTRATION Trigger'].json['Full Name']}} 📧 {{$node['REGISTRATION Trigger'].json['Email Address']}} 🏫 {{$node['REGISTRATION Trigger'].json['College / Organization']}} 📅 {{$node['REGISTRATION Trigger'].json['Event Name']}} 🆔 {{$node['REG.ID'].json.registration_id}} ✅ EventIQ updated successfully",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "a992ac90-8ca1-46d8-82be-790a28c42915",
+      "name": "Send a text message",
+      "webhookId": "3a14d62c-ac05-4222-88a4-0916332cf301",
+      "credentials": {
+        "telegramApi": {
+          "id": "nunclir9rCFMEOmp",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1brfrUovWl4eggf3HRE7lOiVwaVQGPvpx0mJnShrMcFs",
+          "mode": "list",
+          "cachedResultName": "EventIQ_Registrations",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1brfrUovWl4eggf3HRE7lOiVwaVQGPvpx0mJnShrMcFs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1352710709,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1brfrUovWl4eggf3HRE7lOiVwaVQGPvpx0mJnShrMcFs/edit#gid=1352710709"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "751dfa85-17c7-4921-a120-2d2cb5346586",
+      "name": "REGISTRATION Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "UAJiKk1n45BueE7P",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8400d328-4d6c-4401-ab25-23e7be162838",
+              "name": "registration_id",
+              "value": "=EVT-{{$now.format('yyyyMMdd')}}-{{$json['Timestamp']}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "cfcbc8ec-c625-4fd2-92c1-edb87ad62f47",
+      "name": "REG.ID"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={{$json.registration_id}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "2a5423d9-16d9-4a27-8332-b7297add3e30",
+      "name": "QR GEN."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REGISTRATION Trigger": {
+      "main": [
+        [
+          {
+            "node": "REG.ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "REG.ID": {
+      "main": [
+        [
+          {
+            "node": "QR GEN.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "QR GEN.": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "77cc414c-c7c1-4c40-beef-fd771681a1a7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "31436626922295248cc6498e5fe2cc77c0eeac70739fb6ac81173dd2fadcc8a9"
+  },
+  "nodeGroups": [],
+  "id": "qxlJRRd6aC0i1M7S",
+  "tags": []
+}

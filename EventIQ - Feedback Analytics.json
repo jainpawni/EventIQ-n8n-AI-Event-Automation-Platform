@@ -1,0 +1,197 @@
+{
+  "name": "EventIQ - Feedback Analytics",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1Ki-cPhwWBP0KhDgqlTCBvPrV0yGZAbFgIT2GtCKrk08",
+          "mode": "list",
+          "cachedResultName": "EventIQ_Feedback",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ki-cPhwWBP0KhDgqlTCBvPrV0yGZAbFgIT2GtCKrk08/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1099131428,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ki-cPhwWBP0KhDgqlTCBvPrV0yGZAbFgIT2GtCKrk08/edit#gid=1099131428"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1a8de9c7-e276-4350-a6ed-1c1a5365b8c5",
+      "name": "FEEDBACK Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "UAJiKk1n45BueE7P",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Ki-cPhwWBP0KhDgqlTCBvPrV0yGZAbFgIT2GtCKrk08",
+          "mode": "list",
+          "cachedResultName": "EventIQ_Feedback",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ki-cPhwWBP0KhDgqlTCBvPrV0yGZAbFgIT2GtCKrk08/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1099131428,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ki-cPhwWBP0KhDgqlTCBvPrV0yGZAbFgIT2GtCKrk08/edit#gid=1099131428"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "533fbde3-200c-4781-9431-0733e929ae18",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "TgSp6GlpVQAXbGgB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Summarize these event feedback responses for the event organizer. Feedback data: {{ JSON.stringify($input.all()) }} Return: - Overall sentiment - Top 3 positive points - Top 3 improvement suggestions - Average rating out of 10 - A short organizer summary in 2-3 sentences.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        544,
+        0
+      ],
+      "id": "d80cb1c5-0e4f-46fe-9c20-874efe258894",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        544,
+        208
+      ],
+      "id": "1565f41d-6d9d-425e-a9c2-1a23b356a076",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jMK15rp1X0t90sMc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "7154973398",
+        "text": "=📊 EventIQ Feedback Analytics\n\n🤖 AI Summary\n\nOverall Sentiment: Highly Positive\n\n⭐ Top 3 Positive Points\n• QR-based registration and automated reminders\n• Smooth attendance and certificate workflow\n• Professional experience due to AI analytics and Telegram updates\n\n🔧 Top 3 Improvement Suggestions\n• Include more hands-on examples\n• Slightly shorten the session duration\n• Share source code and workflow documentation\n\n📈 Average Rating: 9.67 / 10\n\n📝 Organizer Note:\nParticipants appreciated the automation-driven event experience, especially QR attendance, reminders, certificate generation, and AI-powered analytics. Future events can be improved by adding more practical examples and sharing learning resources.\n",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        864,
+        0
+      ],
+      "id": "1f795523-6965-4394-85cd-9f6e59d1aae4",
+      "name": "Send a feedback message",
+      "webhookId": "2b76fa27-3d5d-478a-a775-cc9d62ed75c9",
+      "credentials": {
+        "telegramApi": {
+          "id": "nunclir9rCFMEOmp",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "FEEDBACK Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a feedback message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ca41f611-8fd2-48ef-8709-94edf93fba97",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "31436626922295248cc6498e5fe2cc77c0eeac70739fb6ac81173dd2fadcc8a9"
+  },
+  "nodeGroups": [],
+  "id": "lYHcXsjpmu5ZzQwp",
+  "tags": []
+}
